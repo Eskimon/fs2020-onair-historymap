@@ -1,0 +1,50 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: arial;
+}
+
+.main {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.flights {
+  position: fixed;
+  top: 25px;
+  bottom: 25px;
+  overflow-y: scroll;
+  right: 25px;
+  width: 25%;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+#mapid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  z-index: 1;
+}
+
+ul {
+  list-style-type: none;
+  padding: 10px
+}
+
+ul li {
+  cursor: pointer;
+}
+
+.color-box {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  margin-right: 6px;
+}
