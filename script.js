@@ -22,37 +22,63 @@ inputElement.addEventListener("change", handleFiles, false);
 
 /*********************************************************/
 
-function handleFiles() {
+async function handleFiles() {
+  var flights = [];
   var fileList = this.files;
+  var color_step = Math.max(20, 360 / fileList.length);
   for(let i=0; i<fileList.length; i++) {
-    let reader = new FileReader();
-    reader.onload = function() {
-      let content = JSON.parse(reader.result);
-      let points = content['StatPoints'];
-      try {
-        // console.log('parsing', content['Flight']['Id']);
-        if(!content['Flight']['LandedTime'])
-          return;
-        if(content['Flight']['Id'] in trajHash)
-          // Don't rerender already existing flight
-          return;
-        addTrip(
-          {lat: content['Flight']['DepartureAirport']['Latitude'], long: content['Flight']['DepartureAirport']['Longitude']},
-          {lat: content['Flight']['ArrivalActualAirport']['Latitude'], long: content['Flight']['ArrivalActualAirport']['Longitude']},
-          points,
-          content['Flight'],
-        );
-      } catch (error) {
-        console.error(error);
-      }
-
-    };
-    reader.readAsText(fileList[i]); 
+    let content = await readTheFile(fileList[i]);
+    content = JSON.parse(content);
+    let points = content['StatPoints'];
+    try {
+      // console.log('parsing', content['Flight']['Id']);
+      if(!content['Flight']['LandedTime'])
+        continue;
+      if(content['Flight']['Id'] in trajHash)
+        // Don't rerender already existing flight
+        continue;
+        flights.push({
+        'date': content['Flight']['StartTime'],
+        'start': {lat: content['Flight']['DepartureAirport']['Latitude'], long: content['Flight']['DepartureAirport']['Longitude']},
+        'stop': {lat: content['Flight']['ArrivalActualAirport']['Latitude'], long: content['Flight']['ArrivalActualAirport']['Longitude']},
+        'points': points,
+        'content': content['Flight'],
+      })
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  // Order by date
+  if(flights.length > 1) {
+    flights.sort(function(a, b) {
+      return a['date'].localeCompare(b['date']);
+    });
+  }
+  // Then add trips
+  for(let i=0; i<flights.length; i++) {
+    // console.log(new Intl.DateTimeFormat().format(new Date(flights[i]['date'])));
+    addTrip(
+      flights[i].start,
+      flights[i].stop,
+      flights[i].points,
+      flights[i].content,
+      `hsl(${(i * color_step) % 360}, 100%, 50%)`
+    );
   }
 }
 
-function addTrip(start, stop, points, metadata) {
-  let color = "#"+((1<<24)*Math.random()|0).toString(16)
+function readTheFile(file) {
+  return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onerror = reject;
+      fr.onload = function() {
+        resolve(fr.result);
+      }
+      fr.readAsText(file);
+  });
+}
+
+function addTrip(start, stop, points, metadata, color) {
   L.marker([start.lat, start.long], {icon: takeOffIcon}).addTo(mymap);
   L.marker([stop.lat, stop.long], {icon: landingIcon}).addTo(mymap);
 
