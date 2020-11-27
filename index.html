@@ -9,7 +9,14 @@
 </head>
 <body>
   <div class="flights">
-    <input type="file" multiple id="inputTraj">
+    <div class="controls">
+      <input type="file" multiple id="inputTraj">
+      <select id="interface" name="interface">
+        <option value="Icon">Icon</option>
+        <option value="Point">Point</option>
+        <option value="None">None</option>
+      </select>
+    </div>
     <ul id="trajList"></ul>
   </div>
   <div id="mapid"></div>

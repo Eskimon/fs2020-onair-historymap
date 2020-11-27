@@ -13,6 +13,11 @@ body {
   display: flex;
 }
 
+.controls {
+  display: flex;
+  justify-content: space-around;
+}
+
 .flights {
   position: fixed;
   top: 25px;
