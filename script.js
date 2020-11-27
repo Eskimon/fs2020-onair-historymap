@@ -32,15 +32,14 @@ async function handleFiles() {
     let points = content['StatPoints'];
     try {
       // console.log('parsing', content['Flight']['Id']);
-      if(!content['Flight']['LandedTime'])
-        continue;
       if(content['Flight']['Id'] in trajHash)
         // Don't rerender already existing flight
         continue;
-        flights.push({
+      let arrivalAirport = content['Flight']['ArrivalActualAirport'] || content['Flight']['ArrivalIntendedAirport'];
+      flights.push({
         'date': content['Flight']['StartTime'],
         'start': {lat: content['Flight']['DepartureAirport']['Latitude'], long: content['Flight']['DepartureAirport']['Longitude']},
-        'stop': {lat: content['Flight']['ArrivalActualAirport']['Latitude'], long: content['Flight']['ArrivalActualAirport']['Longitude']},
+        'stop': {lat: arrivalAirport['Latitude'], long: arrivalAirport['Longitude']},
         'points': points,
         'content': content['Flight'],
       })
@@ -95,7 +94,8 @@ function addTrip(start, stop, points, metadata, color) {
   let textBox = document.createElement('span');
   colorBox.className = 'color-box';
   colorBox.style.backgroundColor = color;
-  textBox.innerText = `${metadata['DepartureAirport']['DisplayName']} - ${metadata['ArrivalActualAirport']['DisplayName']}`;
+  let arrivalAirport = metadata['ArrivalActualAirport'] || metadata['ArrivalIntendedAirport'];
+  textBox.innerText = `${metadata['DepartureAirport']['DisplayName']} - ${arrivalAirport['DisplayName']}`;
   textBox.title = `${metadata['StartTime']}`;
   textBox.setAttribute("aria-flighid", metadata['Id']);
   node.appendChild(colorBox);
