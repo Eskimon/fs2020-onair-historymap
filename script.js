@@ -109,7 +109,7 @@ function readTheFile(file) {
 
 function addTrip(start, stop, points, metadata, color) {
   let pointOption = {
-    radius: 5,
+    radius: 4,
     stroke: true,
     color: '#000000',
     weight: 1,
