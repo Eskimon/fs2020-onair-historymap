@@ -14,7 +14,7 @@ var alt_and_speed_chart = new Chart(alt_and_speed_ctx, {
   type: 'line',
   data: {
     datasets: [{
-      label: 'Altitude',
+      label: 'Altitude (Ft.)',
       backgroundColor: '#e74c3c',
       borderColor: '#e74c3c',
       data: [],
@@ -22,7 +22,7 @@ var alt_and_speed_chart = new Chart(alt_and_speed_ctx, {
       yAxisID: 'y-axis-alt',
       pointRadius: 1,
     }, {
-      label: 'Speed',
+      label: 'Ground speed (Kts)',
       fill: false,
       backgroundColor: '#3498db',
       borderColor: '#3498db',
