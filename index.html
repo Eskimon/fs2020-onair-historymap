@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
   <link rel="stylesheet" href="style.css"/>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
 </head>
 <body>
   <div id="flights">
@@ -33,6 +33,15 @@
       <svg style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="#000000" d="M16,11.78L20.24,4.45L21.97,5.45L16.74,14.5L10.23,10.75L5.46,19H22V21H2V3H4V17.54L9.5,8L16,11.78Z" />
       </svg>
+    </p>
+    <p>
+      <ul>
+        <li><strong>From:</strong> <span id="from"></span></li>
+        <li><strong>To:</strong> <span id="to"></span></li>
+        <li><strong>Take-off at:</strong> <span id="takeoff"></span></li>
+        <li><strong>Landing at:</strong> <span id="landing"></span></li>
+        <li><strong>Aircraft:</strong> <span id="aircraft"></span></li>
+      </ul>
     </p>
     <canvas id="alt_and_speed_chart" width="100%" height="40%"></canvas>
     <canvas id="fuel_chart" width="100%" height="40%"></canvas>

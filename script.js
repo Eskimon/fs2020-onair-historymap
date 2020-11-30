@@ -1,6 +1,7 @@
 var trajHash = {}
 var trajlist = document.getElementById("trajList");
-var charts = document.getElementById("charts")
+var charts = document.getElementById("charts");
+
 document.getElementById("inputTraj").addEventListener("change", handleFiles, false);
 document.getElementById("interface").addEventListener("change", updateInterface, false);
 document.getElementById("chart_handle").addEventListener("click", () => {
@@ -39,19 +40,30 @@ var alt_and_speed_chart = new Chart(alt_and_speed_ctx, {
     },
     scales: {
       xAxes: [{
-        display: false,
+        display: true,
+        type: 'time',
+        time: {
+          minUnit: 'minute',
+          unit: 'minute',
+          displayFormats: {
+            minute: 'kk:mm'
+          }
+        }
       }],
       yAxes: [{
         type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
         display: true,
         position: 'left',
         id: 'y-axis-alt',
+        ticks: {
+          suggestedMin: 0,
+        }
       }, {
         type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
         display: true,
         position: 'right',
         id: 'y-axis-speed',
-
+        suggestedMin: 0,
         // grid line settings
         gridLines: {
           drawOnChartArea: false, // only want the grid lines for one axis to show up
@@ -75,13 +87,20 @@ var fuel_chart = new Chart(fuel_ctx, {
       xAxes: [{
         stacked: true,
         display: false,
+        // type: 'time',
+        time: {
+          minUnit: 'minute',
+          //   unit: 'minute',
+          //   displayFormats: {
+          //     minute: 'kk:mm'
+          //   }
+        }
       }],
       yAxes: [{
         title: "Total (%)",
         stacked: true,
         ticks: {
           min: 0,
-          max: 100
         }
       }]
     }

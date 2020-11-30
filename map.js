@@ -17,3 +17,10 @@ L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 
 var markerLayer = L.layerGroup();
 var circleMarkerLayer = L.layerGroup();
+
+
+var infobox_from = document.getElementById("from");
+var infobox_to = document.getElementById("to");
+var infobox_takeoff = document.getElementById("takeoff");
+var infobox_landing = document.getElementById("landing");
+var infobox_aircraft = document.getElementById("aircraft");

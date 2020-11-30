@@ -90,24 +90,31 @@ flights.push({
     let tanksQty = this.points[0]['Aircraft']['FuelTanks'].length;
     for(let i=0; i<tanksQty; i++) {
       fuel_chart.data.datasets.push({
-        label: `Fuel tank #${i}`,
+        label: `Fuel tank % #${i}`,
         backgroundColor: colors[i],
         data: [],
       })
     }
 
     for(let i=0; i<this.points.length; i++) {
-      alt_and_speed_chart.data.labels.push(i);
-      alt_and_speed_chart.data.datasets[0].data.push(this.points[i]['Aircraft']['Altitude']);
-      alt_and_speed_chart.data.datasets[1].data.push(this.points[i]['Aircraft']['GroundSpeed']);
+      alt_and_speed_chart.data.labels.push(this.points[i]['Aircraft']['FSTime']);
+      fuel_chart.data.labels.push(this.points[i]['Aircraft']['FSTime']);
+      
+      alt_and_speed_chart.data.datasets[0].data.push(Math.round(this.points[i]['Aircraft']['Altitude']));
+      alt_and_speed_chart.data.datasets[1].data.push(Math.round(this.points[i]['Aircraft']['GroundSpeed']));
 
-      fuel_chart.data.labels.push(i);
       for(let j=0; j<tanksQty; j++) {
-        fuel_chart.data.datasets[j].data.push(this.points[i]['Aircraft']['FuelTanks'][j]['PercentFuel'] / tanksQty);
+        fuel_chart.data.datasets[j].data.push(Math.round(this.points[i]['Aircraft']['FuelTanks'][j]['PercentFuel']));
       }
     }
 
     alt_and_speed_chart.update();
     fuel_chart.update();
+
+    infobox_from.textContent = `${this.flight['DepartureAirport']['Name']} (${this.flight['DepartureAirport']['ICAO']})`;
+    infobox_to.textContent = `${this.flight['ArrivalIntendedAirport']['Name']} (${this.flight['ArrivalIntendedAirport']['ICAO']})`;
+    infobox_takeoff.textContent = this.flight['StartTime'];
+    infobox_landing.textContent = this.flight['LandedTime'];
+    infobox_aircraft.textContent = this.points[0]['Aircraft']['AircraftType'];
   }
 }
