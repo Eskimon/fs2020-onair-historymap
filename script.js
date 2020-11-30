@@ -1,54 +1,108 @@
-var mymap = L.map('mapid').setView([46.3630104, 2.9846608], 6);
-var takeOffIcon = L.icon({
-    iconUrl: 'images/airplane-takeoff.png',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-});
-var landingIcon = L.icon({
-    iconUrl: 'images/airplane-landing.png',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-});
-
-
-L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-}).addTo(mymap);
-
 var trajHash = {}
 var trajlist = document.getElementById("trajList");
-var inputElement = document.getElementById("inputTraj");
-inputElement.addEventListener("change", handleFiles, false);
-var inputInterface = document.getElementById("interface");
-inputInterface.addEventListener("change", updateInterface, false);
+var charts = document.getElementById("charts")
+document.getElementById("inputTraj").addEventListener("change", handleFiles, false);
+document.getElementById("interface").addEventListener("change", updateInterface, false);
+document.getElementById("chart_handle").addEventListener("click", () => {
+  charts.classList.toggle("hidden");
+}, false);
+
+var colors = ['#1abc9c', '#3498db', '#34495e', '#e67e22', '#e74c3c'];
+
+var alt_and_speed_ctx = document.getElementById('alt_and_speed_chart');
+var alt_and_speed_chart = new Chart(alt_and_speed_ctx, {
+  type: 'line',
+  data: {
+    datasets: [{
+      label: 'Altitude',
+      backgroundColor: '#e74c3c',
+      borderColor: '#e74c3c',
+      data: [],
+      fill: false,
+      yAxisID: 'y-axis-alt',
+      pointRadius: 1,
+    }, {
+      label: 'Speed',
+      fill: false,
+      backgroundColor: '#3498db',
+      borderColor: '#3498db',
+      data: [],
+      yAxisID: 'y-axis-speed',
+      pointRadius: 1,
+    }]
+  },
+  options: {
+    responsive: true,
+    title: {
+      display: true,
+      text: 'Altitude and speed'
+    },
+    scales: {
+      xAxes: [{
+        display: false,
+      }],
+      yAxes: [{
+        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+        display: true,
+        position: 'left',
+        id: 'y-axis-alt',
+      }, {
+        type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+        display: true,
+        position: 'right',
+        id: 'y-axis-speed',
+
+        // grid line settings
+        gridLines: {
+          drawOnChartArea: false, // only want the grid lines for one axis to show up
+        },
+      }],
+    }
+  }
+});
+
+var fuel_ctx = document.getElementById('fuel_chart');
+var fuel_chart = new Chart(fuel_ctx, {
+  type: 'bar',
+
+  options: {
+    title: {
+      display: true,
+      text: 'Fuel total'
+    },
+    responsive: true,
+    scales: {
+      xAxes: [{
+        stacked: true,
+        display: false,
+      }],
+      yAxes: [{
+        title: "Total (%)",
+        stacked: true,
+        ticks: {
+          min: 0,
+          max: 100
+        }
+      }]
+    }
+  }
+});
 
 /*********************************************************/
 
 function updateInterface(event) {
   let option = event.target.selectedOptions[0].value;
   if(option === 'None') {
-    for(let idx in trajHash) {
-      trajHash[idx]['marker'][0].setOpacity(0);
-      trajHash[idx]['marker'][1].setOpacity(0);
-      trajHash[idx]['point'][0].setStyle({opacity: 0, fillOpacity: 0});
-      trajHash[idx]['point'][1].setStyle({opacity: 0, fillOpacity: 0});
-    }
+    markerLayer.eachLayer((marker) => { marker.setOpacity(0); });
+    circleMarkerLayer.eachLayer((marker) => { marker.setStyle({opacity: 0, fillOpacity: 0}); });
   }
   else if(option === 'Icon') {
-    for(let idx in trajHash) {
-      trajHash[idx]['marker'][0].setOpacity(1);
-      trajHash[idx]['marker'][1].setOpacity(1);
-      trajHash[idx]['point'][0].setStyle({opacity: 0, fillOpacity: 0});
-      trajHash[idx]['point'][1].setStyle({opacity: 0, fillOpacity: 0});
-    }
+    markerLayer.eachLayer((marker) => { marker.setOpacity(1); });
+    circleMarkerLayer.eachLayer((marker) => { marker.setStyle({opacity: 0, fillOpacity: 0}); });
   }
   else if(option === 'Point') {
-    for(let idx in trajHash) {
-      trajHash[idx]['marker'][0].setOpacity(0);
-      trajHash[idx]['marker'][1].setOpacity(0);
-      trajHash[idx]['point'][0].setStyle({opacity: 1, fillOpacity: 1});
-      trajHash[idx]['point'][1].setStyle({opacity: 1, fillOpacity: 1});
-    }
+    markerLayer.eachLayer((marker) => { marker.setOpacity(0); });
+    circleMarkerLayer.eachLayer((marker) => { marker.setStyle({opacity: 1, fillOpacity: 1}); });
   }
 }
 
@@ -59,40 +113,33 @@ async function handleFiles() {
   for(let i=0; i<fileList.length; i++) {
     let content = await readTheFile(fileList[i]);
     content = JSON.parse(content);
-    let points = content['StatPoints'];
     try {
       // console.log('parsing', content['Flight']['Id']);
       if(content['Flight']['Id'] in trajHash)
         // Don't rerender already existing flight
         continue;
-      let arrivalAirport = content['Flight']['ArrivalActualAirport'] || content['Flight']['ArrivalIntendedAirport'];
-      flights.push({
-        'date': content['Flight']['StartTime'],
-        'start': {lat: content['Flight']['DepartureAirport']['Latitude'], long: content['Flight']['DepartureAirport']['Longitude']},
-        'stop': {lat: arrivalAirport['Latitude'], long: arrivalAirport['Longitude']},
-        'points': points,
-        'content': content['Flight'],
-      })
+
+      flights.push(new Flight(content['Flight'], content['StatPoints'], (i * color_step) % 360));
     } catch (error) {
       console.error(error);
     }
   }
+
   // Order by date
   if(flights.length > 1) {
     flights.sort(function(a, b) {
-      return a['date'].localeCompare(b['date']);
+      return a.getStartDate().localeCompare(b.getStartDate());
     });
   }
-  // Then add trips
+
+  // Move that to a dict
   for(let i=0; i<flights.length; i++) {
-    // console.log(new Intl.DateTimeFormat().format(new Date(flights[i]['date'])));
-    addTrip(
-      flights[i].start,
-      flights[i].stop,
-      flights[i].points,
-      flights[i].content,
-      `hsl(${(i * color_step) % 360}, 100%, 50%)`
-    );
+    // Build the leaflet traj
+    flights[i].buildTrajectory();
+    // Then create the list element
+    trajlist.appendChild(flights[i].buildListNode());
+    // Then track it!
+    trajHash[flights[i].flight.Id] = flights[i];
   }
 }
 
@@ -105,56 +152,4 @@ function readTheFile(file) {
       }
       fr.readAsText(file);
   });
-}
-
-function addTrip(start, stop, points, metadata, color) {
-  let pointOption = {
-    radius: 4,
-    stroke: true,
-    color: '#000000',
-    weight: 1,
-    fill: true,
-    fillColor: color,
-    opacity: 0,
-    fillOpacity: 0,
-  }
-  let startMarker = L.marker([start.lat, start.long], {icon: takeOffIcon}).addTo(mymap);
-  let endMarker = L.marker([stop.lat, stop.long], {icon: landingIcon}).addTo(mymap);
-  let startPoint = L.circleMarker([start.lat, start.long], pointOption).addTo(mymap);
-  let endPoint = L.circleMarker([stop.lat, stop.long], pointOption).addTo(mymap);
-
-
-  let poly = [[start.lat, start.long]];
-  for(let i=0; i < points.length; i++) {
-    poly.push([points[i]['Aircraft']['Latitude'], points[i]['Aircraft']['Longitude']]);
-  }
-  poly.push([stop.lat, stop.long]);
-
-  trajHash[metadata['Id']] = {
-    'poly': L.polyline(poly, {color: color}).addTo(mymap),
-    'marker': [startMarker, endMarker],
-    'point': [startPoint, endPoint],
-  };
-
-  let node = document.createElement('li');
-  let colorBox = document.createElement('span');
-  let textBox = document.createElement('span');
-  colorBox.className = 'color-box';
-  colorBox.style.backgroundColor = color;
-  let arrivalAirport = metadata['ArrivalActualAirport'] || metadata['ArrivalIntendedAirport'];
-  textBox.innerText = `${metadata['DepartureAirport']['DisplayName']} - ${arrivalAirport['DisplayName']}`;
-  textBox.title = `${metadata['StartTime']}`;
-  textBox.setAttribute("aria-flighid", metadata['Id']);
-  node.appendChild(colorBox);
-  node.appendChild(textBox);
-  trajlist.appendChild(node);
-
-  textBox.addEventListener("click", (evt) => {
-    let flightid = evt.target.getAttribute('aria-flighid');
-    let bounds = trajHash[flightid]['poly'].getBounds();
-    mymap.fitBounds(bounds);
-  });
-  // for(let i=0; i < points.length; i++) {
-  //   L.circle([points[i]['Aircraft']['Latitude'], points[i]['Aircraft']['Longitude']], {radius: 200}).addTo(mymap);
-  // }
 }

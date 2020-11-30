@@ -18,7 +18,7 @@ body {
   justify-content: space-around;
 }
 
-.flights {
+#flights {
   position: fixed;
   top: 25px;
   bottom: 25px;
@@ -27,6 +27,10 @@ body {
   width: 25%;
   z-index: 2;
   background-color: rgba(255, 255, 255, 0.9);
+}
+
+#flights.hidden {
+  right: calc(-25% - 24px);
 }
 
 #mapid {
@@ -52,4 +56,37 @@ ul li {
   height: 12px;
   display: inline-block;
   margin-right: 6px;
+}
+
+#charts {
+  position: fixed;
+  padding: 10px;
+  top: 25px;
+  bottom: 25px;
+  left: 0px;
+  width: 30%;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: solid 1px darkgray;
+  /* overflow-y: scroll; */
+  transition: left 500ms;
+}
+
+#charts.hidden {
+  left: calc(-30% - 20px);
+}
+
+p#chart_handle {
+  cursor: pointer;
+  position: absolute;
+  right: -32px;
+  top: 50px;
+  height: 30px;
+  width: 30px;
+  background: white;
+  border-radius: 0 3px 3px 0;
+  border: solid 1px darkgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
