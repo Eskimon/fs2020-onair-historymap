@@ -79,7 +79,9 @@ flights.push({
 
   drawChart() {
     // Remove old dataset
-    alt_and_speed_chart.data.datasets = [];
+    alt_and_speed_chart.data.datasets.forEach((dataset) => {
+        dataset.data.pop();
+    });
     alt_and_speed_chart.data.labels = [];
     // Remove old dataset
     fuel_chart.data.datasets = [];
