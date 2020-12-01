@@ -78,19 +78,13 @@ flights.push({
   }
 
   drawChart() {
-    // Remove old dataset
-    alt_and_speed_chart.data.datasets.forEach((dataset) => {
-        dataset.data.pop();
-    });
-    alt_and_speed_chart.data.labels = [];
-    // Remove old dataset
-    fuel_chart.data.datasets = [];
-    fuel_chart.data.labels = [];
+    resetAltSpeedChart();
+    resetFuelChart();
     
     let tanksQty = this.points[0]['Aircraft']['FuelTanks'].length;
     for(let i=0; i<tanksQty; i++) {
       fuel_chart.data.datasets.push({
-        label: `Fuel tank % #${i}`,
+        label: `Fuel tank #${i} (%)`,
         backgroundColor: colors[i],
         data: [],
       })
