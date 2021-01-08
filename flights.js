@@ -40,7 +40,7 @@ flights.push({
     let wrap = false;
     for(let i=0; i < this.points.length; i++) {
       if((lastLon < 0 && this.points[i]['Aircraft']['Longitude'] > 0 && Math.abs(this.points[i]['Aircraft']['Longitude'] > 150)) || 
-         (lastLon > 0 && this.points[i]['Aircraft']['Longitude'] < 0 && Math.abs(this.points[i]['Aircraft']['Longitude'] > 150))) {
+         (lastLon > 0 && this.points[i]['Aircraft']['Longitude'] < 0 && Math.abs(this.points[i]['Aircraft']['Longitude'] < -150))) {
         wrap = true
       }
       let point = L.latLng(this.points[i]['Aircraft']['Latitude'], this.points[i]['Aircraft']['Longitude']);
