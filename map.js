@@ -11,9 +11,6 @@ var landingIcon = L.icon({
     iconAnchor: [12, 12],
 });
 
-L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-}).addTo(mymap);
-
 var markerLayer = L.layerGroup();
 var circleMarkerLayer = L.layerGroup();
+var layer = undefined;

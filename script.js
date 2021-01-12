@@ -2,9 +2,12 @@ var trajHash = {}
 
 document.getElementById("inputTraj").addEventListener("change", handleFiles, false);
 document.getElementById("interface").addEventListener("change", updateInterface, false);
+document.getElementById("map_bg").addEventListener("change", (e) => {updateMapBackground(e.target.value)}, false);
 document.getElementById("chart_handle").addEventListener("click", () => {
   charts.classList.toggle("hidden");
 }, false);
+
+updateMapBackground('standard')
 
 /*********************************************************/
 
@@ -21,6 +24,29 @@ function updateInterface(event) {
   else if(option === 'Point') {
     markerLayer.eachLayer((marker) => { marker.setOpacity(0); });
     circleMarkerLayer.eachLayer((marker) => { marker.setStyle({opacity: 1, fillOpacity: 1}); });
+  }
+}
+
+function updateMapBackground(choice) {
+  if (layer) {
+    mymap.removeLayer(layer);
+  }
+  switch(choice) {
+    case('topo'):
+      layer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
+              }).addTo(mymap);
+      break;
+    case('imagery'):
+      layer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              }).addTo(mymap);
+      break;
+    case('standard'):
+      layer = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+              }).addTo(mymap);
+    break;
   }
 }
 
